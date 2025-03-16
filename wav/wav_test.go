@@ -136,3 +136,37 @@ func TestReadWavFile_Stereo(t *testing.T) {
 		}
 	}
 }
+
+// Test reading a WAV file with an unsupported bit depth (e.g., 8-bit).
+func TestReadWavFile_WrongBitDepth(t *testing.T) {
+	tmpFile, err := os.CreateTemp("", "wrongbitdepth*.wav")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(tmpFile.Name())
+
+	// Set up a WAV encoder with 8-bit depth.
+	enc := wav.NewEncoder(tmpFile, 44100, 8, 1, 1)
+	samples := []int{10, 20, 30, 40}
+	buf := &audioWav.IntBuffer{
+		Format: &audioWav.Format{
+			NumChannels: 1,
+			SampleRate:  44100,
+		},
+		Data:           samples,
+		SourceBitDepth: 8,
+	}
+
+	if err := enc.Write(buf); err != nil {
+		t.Fatal(err)
+	}
+	if err := enc.Close(); err != nil {
+		t.Fatal(err)
+	}
+	tmpFile.Close()
+
+	_, _, err = audio.ReadWavFile(tmpFile.Name())
+	if err == nil {
+		t.Error("expected error for 8-bit WAV file, got nil")
+	}
+}
