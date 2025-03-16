@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	audioFile := "audio.wav"
+	audioFile := "assets/audio.wav"
 
 	samples, sampleRate, err := audio.ReadWavFile(audioFile)
 	if err != nil {

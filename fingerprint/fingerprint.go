@@ -2,6 +2,7 @@ package fingerprint
 
 import (
 	"errors"
+	"fingerprint/dsp"
 )
 
 const (
@@ -22,5 +23,26 @@ func Fingerprint(samples []int16, sampleRate int) ([]uint32, error) {
 	for i, s := range samples {
 		floatSamples[i] = float64(s) / 32768.0
 	}
-	return nil, nil
+
+	cutoff := float64(TargetSampleRate) / 2.0
+	kernel := dsp.GenerateLowPassKernel(cutoff, sampleRate, FilterTaps)
+
+	filtered := dsp.ApplyFIRFilter(floatSamples, kernel)
+
+	decimationFactor := sampleRate / TargetSampleRate
+	downsampled := make([]float64, 0, len(filtered)/decimationFactor)
+	for i := 0; i < len(filtered); i += decimationFactor {
+		downsampled = append(downsampled, filtered[i])
+	}
+
+	frames := frameSignal(downsampled, FrameSize, HopSize)
+
+	window := hammingWindow(FrameSize)
+
+	spectrogram := computeSpectrogram(frames, window)
+
+	peaks := DetectPeaks(spectrogram, NumBands)
+
+	hashes := HashFingerprint(peaks, TargetZoneFrames)
+	return hashes, nil
 }
