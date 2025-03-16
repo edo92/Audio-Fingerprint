@@ -14,6 +14,8 @@ The fingerprinting approach is inspired by the Shazam algorithm, where constella
 
 ## Quick Start
 
+[!NOTE] **audio file needs to be 16-bit PCM format**
+
 1. Clone the repository:
 
 ```bash
