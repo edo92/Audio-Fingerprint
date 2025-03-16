@@ -1,10 +1,9 @@
 package fingerprint
 
-// Peak represents a spectral peak in a frame.
 type Peak struct {
-	FrameIndex int     // Index of the frame.
-	FreqBin    int     // Frequency bin index.
-	Magnitude  float64 // Magnitude of the peak.
+	FrameIndex int
+	FreqBin    int
+	Magnitude  float64
 }
 
 // DetectPeaks finds the strongest frequency peaks in each band of the spectrogram

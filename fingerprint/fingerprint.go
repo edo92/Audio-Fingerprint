@@ -1,6 +1,8 @@
 package fingerprint
 
-import "errors"
+import (
+	"errors"
+)
 
 const (
 	TargetSampleRate = 11025 // Downsampled rate.
@@ -20,6 +22,5 @@ func Fingerprint(samples []int16, sampleRate int) ([]uint32, error) {
 	for i, s := range samples {
 		floatSamples[i] = float64(s) / 32768.0
 	}
-
 	return nil, nil
 }
