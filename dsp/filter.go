@@ -4,10 +4,13 @@ import (
 	"math"
 )
 
+// GenerateLowPassKernel generates a low-pass FIR filter kernel using a windowed-sinc method.
+// cutoffFreq is in Hz, sampleRate in Hz, and numTaps is the filter length (should be odd).
 func GenerateLowPassKernel(cutoffFreq float64, sampleRate int, numTaps int) []float64 {
 	kernel := make([]float64, numTaps)
 	fc := cutoffFreq / float64(sampleRate)
 	m := float64(numTaps - 1)
+
 	for i := 0; i < numTaps; i++ {
 		n := float64(i)
 		if n == m/2 {
