@@ -116,3 +116,103 @@ func TestDetectPeaks(t *testing.T) {
 		})
 	}
 }
+
+func TestHashFingerprint(t *testing.T) {
+	tests := []struct {
+		name       string
+		peaks      []Peak
+		targetZone int
+		expected   []uint32
+	}{
+		{
+			name:       "empty peaks",
+			peaks:      []Peak{},
+			targetZone: 5,
+			expected:   []uint32{},
+		},
+		{
+			name: "single peak, no pair",
+			peaks: []Peak{
+				{FrameIndex: 10, FreqBin: 100, Magnitude: 0},
+			},
+			targetZone: 5,
+			expected:   []uint32{},
+		},
+		{
+			name: "two peaks valid pair",
+			peaks: []Peak{
+				{FrameIndex: 10, FreqBin: 100, Magnitude: 0},
+				{FrameIndex: 15, FreqBin: 200, Magnitude: 0},
+			},
+			targetZone: 10, // dt = 5, within targetZone.
+			expected: []uint32{
+				(100 << 23) | (200 << 14) | 5,
+			},
+		},
+		{
+			name: "three peaks multiple pairs",
+			peaks: []Peak{
+				{FrameIndex: 10, FreqBin: 50, Magnitude: 0},
+				{FrameIndex: 12, FreqBin: 300, Magnitude: 0},
+				{FrameIndex: 13, FreqBin: 400, Magnitude: 0},
+			},
+			targetZone: 5,
+			// Expected pairs:
+			// From peak 0 (frame 10): pair with peak 1 (dt=2) and peak 2 (dt=3).
+			// From peak 1 (frame 12): pair with peak 2 (dt=1).
+			expected: []uint32{
+				(50 << 23) | (300 << 14) | 2,
+				(50 << 23) | (400 << 14) | 3,
+				(300 << 23) | (400 << 14) | 1,
+			},
+		},
+		{
+			name: "target zone filter, no pair if dt > targetZone",
+			peaks: []Peak{
+				{FrameIndex: 10, FreqBin: 100, Magnitude: 0},
+				{FrameIndex: 30, FreqBin: 200, Magnitude: 0},
+			},
+			targetZone: 5, // dt = 20, exceeds targetZone.
+			expected:   []uint32{},
+		},
+		{
+			name: "dt clipping test",
+			peaks: []Peak{
+				{FrameIndex: 0, FreqBin: 10, Magnitude: 0},
+				// dt = 20000, which exceeds 0x3FFF (16383) so should be clipped.
+				{FrameIndex: 20000, FreqBin: 20, Magnitude: 0},
+			},
+			targetZone: 30000, // Allow dt > 0x3FFF so clipping occurs.
+			expected: []uint32{
+				(10 << 23) | (20 << 14) | 0x3FFF,
+			},
+		},
+		{
+			name: "frequency clipping test",
+			peaks: []Peak{
+				// Frequencies above 511 (0x1FF) should be clipped.
+				{FrameIndex: 0, FreqBin: 600, Magnitude: 0},
+				{FrameIndex: 1, FreqBin: 700, Magnitude: 0},
+			},
+			targetZone: 5, // dt = 1
+			expected: []uint32{
+				(0x1FF << 23) | (0x1FF << 14) | 1,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			hashes := HashFingerprint(tc.peaks, tc.targetZone)
+			if len(hashes) != len(tc.expected) {
+				t.Errorf("expected %d hashes, got %d", len(tc.expected), len(hashes))
+				return
+			}
+			for i, h := range hashes {
+				if h != tc.expected[i] {
+					t.Errorf("hash %d: expected 0x%08X, got 0x%08X", i, tc.expected[i], h)
+				}
+			}
+		})
+	}
+}
