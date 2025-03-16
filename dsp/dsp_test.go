@@ -74,3 +74,31 @@ func TestApplyFIRFilterSmoothing(t *testing.T) {
 		}
 	}
 }
+
+func TestApplyFIRFilterEmptyInput(t *testing.T) {
+	// When input is empty, the output should be an empty slice.
+	input := []float64{}
+	kernel := []float64{0, 1, 0}
+	output := dsp.ApplyFIRFilter(input, kernel)
+	if len(output) != 0 {
+		t.Errorf("expected empty output, got length %d", len(output))
+	}
+}
+
+func TestApplyFIRFilterEmptyKernel(t *testing.T) {
+	// When the kernel is empty, no accumulation is performed,
+	// so the output should be a slice of zeros with the same length as the input.
+	input := []float64{1, 2, 3}
+	kernel := []float64{}
+	expected := []float64{0, 0, 0}
+
+	output := dsp.ApplyFIRFilter(input, kernel)
+	if len(output) != len(expected) {
+		t.Fatalf("expected output length %d, got %d", len(expected), len(output))
+	}
+	for i, v := range output {
+		if !almostEqual(v, expected[i], 1e-6) {
+			t.Errorf("at index %d: expected %f, got %f", i, expected[i], v)
+		}
+	}
+}
