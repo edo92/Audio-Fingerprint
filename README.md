@@ -12,6 +12,39 @@ This library implements an audio fingerprinting algorithm that can generate robu
 
 The fingerprinting approach is inspired by the Shazam algorithm, where constellations of audio peaks in the time-frequency domain are used to create fingerprints.
 
+## Quick Start
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/edo92/Audio-Fingerprint
+cd audio-fingerprint
+```
+
+2. Build the application:
+
+```bash
+go build -o audio-fp ./cmd/main.go
+```
+
+3. Make the binary executable (Linux/Mac):
+
+```bash
+chmod +x audio-fp
+```
+
+4. Verify the installation:
+
+```bash
+./audio-fp --version
+```
+
+5. Run dev
+
+```bash
+go run ./cmd/main.go
+```
+
 ## Architecture
 
 The system is organized into three main components:
