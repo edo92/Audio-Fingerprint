@@ -39,3 +39,20 @@ func TestGenerateLowPassKernel(t *testing.T) {
 		}
 	}
 }
+
+func TestApplyFIRFilterIdentity(t *testing.T) {
+	// Identity filter: using kernel [0, 1, 0] should return the input unchanged.
+	input := []float64{1, 2, 3, 4, 5}
+	kernel := []float64{0, 1, 0}
+	expected := []float64{1, 2, 3, 4, 5}
+
+	output := dsp.ApplyFIRFilter(input, kernel)
+	if len(output) != len(expected) {
+		t.Fatalf("expected output length %d, got %d", len(expected), len(output))
+	}
+	for i, v := range output {
+		if !almostEqual(v, expected[i], 1e-6) {
+			t.Errorf("at index %d: expected %f, got %f", i, expected[i], v)
+		}
+	}
+}
