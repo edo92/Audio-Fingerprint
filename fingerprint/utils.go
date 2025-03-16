@@ -2,6 +2,7 @@ package fingerprint
 
 import "math"
 
+// frameSignal divides the signal into overlapping frames.
 func frameSignal(signal []float64, frameSize int, hopSize int) [][]float64 {
 	var frames [][]float64
 	n := len(signal)
@@ -13,6 +14,7 @@ func frameSignal(signal []float64, frameSize int, hopSize int) [][]float64 {
 	return frames
 }
 
+// hammingWindow returns a Hamming window of length n.
 func hammingWindow(n int) []float64 {
 	window := make([]float64, n)
 	for i := 0; i < n; i++ {
