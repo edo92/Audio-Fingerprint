@@ -139,7 +139,7 @@ func TestReadWavFile_Stereo(t *testing.T) {
 
 // Test reading a WAV file with an unsupported bit depth (e.g., 8-bit).
 func TestReadWavFile_WrongBitDepth(t *testing.T) {
-	tmpFile, err := os.CreateTemp("", "wrongbitdepth*.wav")
+	tmpFile, err := os.CreateTemp("", "assets/audio*.wav")
 	if err != nil {
 		t.Fatal(err)
 	}
