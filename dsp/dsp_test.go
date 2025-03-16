@@ -102,3 +102,26 @@ func TestApplyFIRFilterEmptyKernel(t *testing.T) {
 		}
 	}
 }
+
+// slicesAlmostEqual compares two float64 slices element-wise.
+func slicesAlmostEqual(a, b []float64, tolerance float64) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if !almostEqual(a[i], b[i], tolerance) {
+			return false
+		}
+	}
+	return true
+}
+
+func TestComputeFFTImpulse(t *testing.T) {
+	frame := []float64{1, 0, 0, 0}
+	expected := []float64{1, 1, 1}
+
+	output := dsp.ComputeFFT(frame)
+	if !slicesAlmostEqual(output, expected, 1e-6) {
+		t.Errorf("ComputeFFT(impulse) = %v, want %v", output, expected)
+	}
+}
