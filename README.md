@@ -130,39 +130,6 @@ Fingerprints are created by pairing peaks within a target zone (default: 20 fram
 
 These hashes can be used for audio identification by matching against a database of known fingerprints.
 
-## Usage
-
-Basic usage example:
-
-```go
-package main
-
-import (
-	"fingerprint/fingerprint"
-	audio "fingerprint/wav"
-	"fmt"
-	"log"
-)
-
-func main() {
-	// Load a WAV file
-	audioFile := "audio.wav"
-	samples, sampleRate, err := audio.ReadWavFile(audioFile)
-	if err != nil {
-		log.Fatalf("Failed to read WAV file: %v", err)
-	}
-
-	// Generate fingerprint hashes
-	hashes, err := fingerprint.Fingerprint(samples, sampleRate)
-	if err != nil {
-		log.Fatalf("Failed to generate fingerprint: %v", err)
-	}
-
-	// Use the hashes for identification
-	fmt.Println(hashes)
-}
-```
-
 ## API Reference
 
 ### wav package
