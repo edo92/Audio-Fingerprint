@@ -56,3 +56,21 @@ func TestApplyFIRFilterIdentity(t *testing.T) {
 		}
 	}
 }
+
+func TestApplyFIRFilterSmoothing(t *testing.T) {
+	// Smoothing filter: a 3-point moving average kernel [1/3, 1/3, 1/3].
+	input := []float64{1, 2, 3, 4, 5}
+	kernel := []float64{1.0 / 3, 1.0 / 3, 1.0 / 3}
+
+	expected := []float64{1.0, 2.0, 3.0, 4.0, 3.0}
+
+	output := dsp.ApplyFIRFilter(input, kernel)
+	if len(output) != len(expected) {
+		t.Fatalf("expected output length %d, got %d", len(expected), len(output))
+	}
+	for i, v := range output {
+		if !almostEqual(v, expected[i], 1e-6) {
+			t.Errorf("at index %d: expected %f, got %f", i, expected[i], v)
+		}
+	}
+}
