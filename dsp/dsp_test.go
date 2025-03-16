@@ -125,3 +125,13 @@ func TestComputeFFTImpulse(t *testing.T) {
 		t.Errorf("ComputeFFT(impulse) = %v, want %v", output, expected)
 	}
 }
+
+func TestComputeFFTConstant(t *testing.T) {
+	// For input [1, 1, 1, 1], FFT[0]=4 (DC component), all other values=0
+	frame := []float64{1, 1, 1, 1}
+	expected := []float64{4, 0, 0}
+	output := dsp.ComputeFFT(frame)
+	if !slicesAlmostEqual(output, expected, 1e-6) {
+		t.Errorf("ComputeFFT(constant) = %v, want %v", output, expected)
+	}
+}
