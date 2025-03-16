@@ -2,7 +2,7 @@ package main
 
 import (
 	"fingerprint/fingerprint"
-	"fingerprint/wav"
+	audio "fingerprint/wav"
 	"fmt"
 	"log"
 )
@@ -10,7 +10,7 @@ import (
 func main() {
 	audioFile := "audio.wav"
 
-	samples, sampleRate, err := wav.ReadWavFile(audioFile)
+	samples, sampleRate, err := audio.ReadWavFile(audioFile)
 	if err != nil {
 		log.Fatalf("Failed to read WAV file: %v", err)
 	}
