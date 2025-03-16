@@ -20,16 +20,12 @@ func almostEqualSlices(a, b []float64, tol float64) bool {
 }
 
 func TestComputeSpectrogram(t *testing.T) {
-	// Test data: two frames with window [2,2,2,2]
-	// Frame 1: [1,1,1,1] -> [2,2,2,2]
-	// Frame 2: [2,2,2,2] -> [4,4,4,4]
 	frames := [][]float64{
 		{1, 1, 1, 1},
 		{2, 2, 2, 2},
 	}
 	window := []float64{2, 2, 2, 2}
 
-	// Expected FFT magnitudes: [8,0,0] for frame 1, [16,0,0] for frame 2
 	expected := [][]float64{
 		{8, 0, 0},
 		{16, 0, 0},
@@ -65,11 +61,9 @@ func TestDetectPeaks(t *testing.T) {
 		{
 			name: "one frame, two bands, frame length 4",
 			spectrogram: [][]float64{
-				{1.0, 2.0, 3.0, 2.5}, // Single frame
+				{1.0, 2.0, 3.0, 2.5},
 			},
 			numBands: 2,
-			// Band 0 (0-1): max=2.0 at index 1
-			// Band 1 (2-3): max=3.0 at index 2
 			expected: []Peak{
 				{FrameIndex: 0, FreqBin: 1, Magnitude: 2.0},
 				{FrameIndex: 0, FreqBin: 2, Magnitude: 3.0},
@@ -78,12 +72,10 @@ func TestDetectPeaks(t *testing.T) {
 		{
 			name: "two frames, three bands, frame length 6",
 			spectrogram: [][]float64{
-				{5, 4, 1, 7, 3, 6},  // Frame 0
-				{2, 8, 9, 3, 10, 1}, // Frame 1
+				{5, 4, 1, 7, 3, 6},
+				{2, 8, 9, 3, 10, 1},
 			},
 			numBands: 3,
-			// Frame 0: Band 0 (0-1): max=5@0, Band 1 (2-3): max=7@3, Band 2 (4-5): max=6@5
-			// Frame 1: Band 0 (0-1): max=8@1, Band 1 (2-3): max=9@2, Band 2 (4-5): max=10@4
 			expected: []Peak{
 				{FrameIndex: 0, FreqBin: 0, Magnitude: 5},
 				{FrameIndex: 0, FreqBin: 3, Magnitude: 7},
@@ -96,10 +88,9 @@ func TestDetectPeaks(t *testing.T) {
 		{
 			name: "non-divisible frame length",
 			spectrogram: [][]float64{
-				{3, 1, 2, 4, 1}, // Length 5, 2 bands
+				{3, 1, 2, 4, 1},
 			},
 			numBands: 2,
-			// Band 0 (0-1): max=3@0, Band 1 (2-4): max=4@3
 			expected: []Peak{
 				{FrameIndex: 0, FreqBin: 0, Magnitude: 3},
 				{FrameIndex: 0, FreqBin: 3, Magnitude: 4},
@@ -144,7 +135,7 @@ func TestHashFingerprint(t *testing.T) {
 				{FrameIndex: 10, FreqBin: 100, Magnitude: 0},
 				{FrameIndex: 15, FreqBin: 200, Magnitude: 0},
 			},
-			targetZone: 10, // dt = 5, within targetZone.
+			targetZone: 10,
 			expected: []uint32{
 				(100 << 23) | (200 << 14) | 5,
 			},
@@ -157,9 +148,7 @@ func TestHashFingerprint(t *testing.T) {
 				{FrameIndex: 13, FreqBin: 400, Magnitude: 0},
 			},
 			targetZone: 5,
-			// Expected pairs:
-			// From peak 0 (frame 10): pair with peak 1 (dt=2) and peak 2 (dt=3).
-			// From peak 1 (frame 12): pair with peak 2 (dt=1).
+
 			expected: []uint32{
 				(50 << 23) | (300 << 14) | 2,
 				(50 << 23) | (400 << 14) | 3,
@@ -179,10 +168,9 @@ func TestHashFingerprint(t *testing.T) {
 			name: "dt clipping test",
 			peaks: []Peak{
 				{FrameIndex: 0, FreqBin: 10, Magnitude: 0},
-				// dt = 20000, which exceeds 0x3FFF (16383) so should be clipped.
 				{FrameIndex: 20000, FreqBin: 20, Magnitude: 0},
 			},
-			targetZone: 30000, // Allow dt > 0x3FFF so clipping occurs.
+			targetZone: 30000,
 			expected: []uint32{
 				(10 << 23) | (20 << 14) | 0x3FFF,
 			},
@@ -190,7 +178,6 @@ func TestHashFingerprint(t *testing.T) {
 		{
 			name: "frequency clipping test",
 			peaks: []Peak{
-				// Frequencies above 511 (0x1FF) should be clipped.
 				{FrameIndex: 0, FreqBin: 600, Magnitude: 0},
 				{FrameIndex: 1, FreqBin: 700, Magnitude: 0},
 			},
