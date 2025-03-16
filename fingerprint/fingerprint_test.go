@@ -203,3 +203,43 @@ func TestHashFingerprint(t *testing.T) {
 		})
 	}
 }
+
+func TestFingerprint_LowSampleRate(t *testing.T) {
+	samples := make([]int16, FrameSize)
+
+	_, err := Fingerprint(samples, TargetSampleRate-1000)
+	if err == nil {
+		t.Errorf("expected error when sample rate is lower than target (%d Hz), got nil", TargetSampleRate)
+	}
+}
+
+func TestFingerprint_ZeroSignal(t *testing.T) {
+	samples := make([]int16, FrameSize)
+
+	hashes, err := Fingerprint(samples, TargetSampleRate)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	const expectedHashes = 15
+	if len(hashes) != expectedHashes {
+		t.Errorf("expected %d hashes, got %d", expectedHashes, len(hashes))
+	}
+}
+
+func TestFingerprint_ConstantSignal(t *testing.T) {
+	n := FrameSize * 2
+	samples := make([]int16, n)
+	// Set a mid-level costant amplitude.
+	for i := range samples {
+		samples[i] = 10000
+	}
+	hashes, err := Fingerprint(samples, TargetSampleRate)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(hashes) == 0 {
+		t.Errorf("expected non-zero number of hashes for constant signal, got 0")
+	}
+}
