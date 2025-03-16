@@ -30,3 +30,26 @@ func GenerateLowPassKernel(cutoffFreq float64, sampleRate int, numTaps int) []fl
 	}
 	return kernel
 }
+
+// ApplyFIRFilter applies an FIR filter to the input signal using the provided kernel.
+func ApplyFIRFilter(input []float64, kernel []float64) []float64 {
+	n := len(input)
+	k := len(kernel)
+	output := make([]float64, n)
+	half := k / 2
+	for i := 0; i < n; i++ {
+		acc := 0.0
+		for j := 0; j < k; j++ {
+			idx := i + j - half
+			if idx < 0 {
+				continue
+			}
+			if idx >= n {
+				break
+			}
+			acc += input[idx] * kernel[j]
+		}
+		output[i] = acc
+	}
+	return output
+}
